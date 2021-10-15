@@ -1,0 +1,25 @@
+.form__register{
+    width: 600px;
+    height: 400px;
+    display:flex;
+}
+.register__title {
+    font-family: Tahoma, Verdana, sans-serif;
+    font-size: 30px;
+    font-weight: bold;
+    margin-top: 35px;
+}
+.text__change {
+    font-family: Tahoma;
+    font-size: 12px;
+    position: absolute;
+    bottom: 5px;
+}
+.text__change__click {
+    cursor: pointer;
+    text-decoration:underline;
+}
+.text__change__click:hover {
+    color:royalblue;
+}
+

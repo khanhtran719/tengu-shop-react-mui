@@ -1,0 +1,16 @@
+.banner {
+    width: 98%;
+    position: relative;
+    margin: 12px;
+}
+.absolute__content {
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    z-index: 101;
+}
+.absolute__text {
+    font-size: 14px;
+    margin-top: 0;
+    margin-bottom: 8px;
+}

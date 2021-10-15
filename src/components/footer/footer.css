@@ -1,0 +1,13 @@
+.footer {
+    width: 100%;
+    background-color: lightgray;
+    position: relative;
+}
+.footer__text__hover {
+    margin: 0;
+    text-decoration: none;
+    cursor: pointer;
+}
+.footer__text__hover:hover {
+    color:dodgerblue;
+}

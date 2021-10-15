@@ -1,0 +1,41 @@
+/* header  */
+.header {
+    position: relative;
+    width: 100%;
+    margin: 0;
+}
+.header__top__container,
+.header__bot__container{
+    max-width: 1024px;
+    margin: auto;
+    display: flex !important;
+    justify-content: space-between;
+    text-align: center;
+}
+.header__top__phone,
+.header__top__text {
+    font-family: Tahoma;
+    font-size: 14px;
+    margin: 5px 10px;
+}
+.header__top__text {
+    cursor: pointer;
+}
+.header__logo {
+    width: 400px;
+    margin: auto;
+}
+.header__bot__text {
+    color: black;
+    font-size: 17px;
+    font-weight: 500;
+    padding: 12px;
+    cursor: pointer;
+    text-decoration: none;
+}
+.header__bot__text:hover {
+    color: grey;
+}
+.hot__sale {   
+    background-color: red;
+}

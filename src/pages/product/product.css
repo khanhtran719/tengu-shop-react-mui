@@ -1,0 +1,16 @@
+/* form__search */
+.form__search {
+    width: 100%;
+    height: 36px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #EEEEEE;
+}
+.input__search {
+    border: none;
+    outline-width: 0;
+    width: 78%;
+    font-size: 16px;
+    padding-left: 16px;
+    background-color: #EEEEEE;
+}
