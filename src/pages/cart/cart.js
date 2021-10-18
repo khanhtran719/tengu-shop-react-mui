@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./cart.css";
 import { Link } from "react-router-dom";
 import Box from "@mui/material/Box";
@@ -17,15 +17,71 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from '@mui/icons-material/Add';
 
 import { MyContext } from "../../context/mycontext";
-import Banner from "../../assets/banner_product.png";
+// import Banner from "../../assets/banner_product.png";
 
 import Footer from "../../components/footer/footer";
 
 const Cart = () => {
-    return (
-        <Box m={0} p={0} mt={1}>
-            <Box position="relative">
-                <img src={Banner} width="100%" alt="Banner sản phẩm" />
+    const { cart, setCart } = useContext(MyContext);
+    const [payment, setPayment] = useState(0);
+
+    useEffect(() => {
+        let sumOfMoney = 0;
+        cart.map((product) => {
+            sumOfMoney += product.price * product.amount;
+        })
+        setPayment(sumOfMoney);
+    })
+    
+    const onDeleteItem = (i) => {
+        setCart(cart.filter((item) => item.id !== i));
+    }
+    const onDecreaseAmount = (i) => {
+        let checkIndex = -1;
+        checkIndex = cart.findIndex(tmp => tmp.id === i);
+        if (cart[checkIndex].amount > 1) {            
+            let arrayCart = [...cart];
+            arrayCart[checkIndex].amount -= 1; 
+            setCart(arrayCart);
+        }        
+    }
+    const onIncreaseAmount = (i) => {
+        let checkIndex = -1;
+        checkIndex = cart.findIndex(tmp => tmp.id === i);
+        let arrayCart = [...cart];
+        arrayCart[checkIndex].amount += 1; 
+        setCart(arrayCart);
+    }
+    const emptyCart = () => {
+        return (
+            <Box m={0} p={0} mt={1}>
+                <Box
+                    fontSize="40px"
+                    fontWeight="bold"
+                    textAlign="center"
+                    mt={5}
+                >
+                    Giỏ hàng trống
+                </Box>
+                <Box textAlign="center" mt={4} mb={4}>
+                    <Button
+                        size="large"
+                        variant="contained"
+                        color="error"
+                        sx={{ width: 200}}
+                    >
+                        <Link to="/product" style={{textDecoration: "none", color: "black"}}>Xem &amp; Lựa thêm</Link>   
+                    </Button>
+                </Box>
+                <Footer/>
+            </Box>
+        );
+    }
+
+    const notEmptyCart = () => {
+        return (
+            <Box m={0} p={0} mt={1}>
+            <Box position="relative" width="100%" height="150px" bgcolor="lavender">
                 <Container maxWidth="lg">
                     <Box
                         position="absolute"
@@ -39,7 +95,7 @@ const Cart = () => {
             </Box>
             <Container maxWidth="lg">
                 <Box sx={{ border: "1px solid lightgray" }}>
-                    <Table aria-label="simple table" >
+                    <Table aria-label="simple table">
                         <TableHead>
                             <TableRow>
                                 <TableCell align="center">Ảnh sản phẩm</TableCell>
@@ -51,32 +107,41 @@ const Cart = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            <TableRow
-                                sx={{ '&:last-child, &:last-child': { border: 0 } }}
-                            >
-                                <TableCell align="center">
-                                    <img width="100px" src="https://cdn.shopify.com/s/files/1/0361/9563/1237/products/VR247-10234094_300x.jpg?v=1587357151" alt="1" />
-                                </TableCell>
-                                <TableCell align="center">name 1đâsdasdasdas</TableCell>
-                                <TableCell align="center">2312123</TableCell>
-                                <TableCell align="center">
-                                    <Box display="flex" justifyContent="center">
-                                        <IconButton aria-label="remove" size="small">
-                                            <RemoveIcon />
-                                        </IconButton>
-                                        <Box p={1}>1</Box>
-                                        <IconButton aria-label="add" size="small">
-                                            <AddIcon />
-                                        </IconButton>
-                                    </Box>
-                                </TableCell>
-                                <TableCell align="center">1</TableCell>
-                                <TableCell align="center">
-                                    <IconButton aria-label="delete">
-                                        <DeleteIcon />
-                                    </IconButton>
-                                </TableCell>
-                            </TableRow>
+                            {cart.map((product) => {
+                                return (
+                                    <TableRow
+                                        key={product.id}
+                                        // sx={{ '&:last-child, &:last-child': { border: 0 } }}
+                                    >
+                                        <TableCell align="center">
+                                            <img width="100px" src="https://cdn.shopify.com/s/files/1/0361/9563/1237/products/VR247-10234094_300x.jpg?v=1587357151" alt="1" />
+                                        </TableCell>
+                                        <TableCell align="center">{product.name}</TableCell>
+                                        <TableCell align="center">{product.price}đ</TableCell>
+                                        <TableCell align="center">
+                                            <Box display="flex" justifyContent="center">
+                                                <IconButton 
+                                                    aria-label="decrease" 
+                                                    size="small" 
+                                                    onClick={onDecreaseAmount.bind(this, product.id)}
+                                                >
+                                                    <RemoveIcon />
+                                                </IconButton>
+                                                <Box p={1}>{product.amount}</Box>
+                                                <IconButton aria-label="increase" size="small" onClick={onIncreaseAmount.bind(this, product.id)}>
+                                                    <AddIcon />
+                                                </IconButton>
+                                            </Box>
+                                        </TableCell>
+                                        <TableCell align="center">{product.price * product.amount}đ</TableCell>
+                                        <TableCell align="center">
+                                            <IconButton aria-label="delete" onClick={onDeleteItem.bind(this, product.id)}>
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
                         </TableBody>
                     </Table>
                 </Box>
@@ -86,8 +151,8 @@ const Cart = () => {
                         <Box textAlign="right">
                             <Link to="/product" className="add__text">Xem &amp; Lựa thêm</Link>
                         </Box>
-                        <Box display="flex" mt={4}>
-                            <Box 
+                        <Box display="flex" mt={4} >
+                            <Box
                                 fontSize="22px"
                                 fontWeight="Bold"
                                 fontFamily="Tahoma"
@@ -95,31 +160,41 @@ const Cart = () => {
                                 Tổng đơn hàng
                             </Box>
                             <Box
-                                ml={3} 
+                                ml={3}
                                 fontSize="22px"
                                 fontWeight="500"
                                 fontFamily="Tahoma"
                             >
-                                12,000,000 đ
+                                {payment} đ
                             </Box>
                         </Box>
-                        <Box 
-                            fontSize="13px" 
+                        <Box
+                            fontSize="13px"
                             textAlign="right"
                             fontFamily="Tahoma"
                             mt={2}
                         >
                             Miễn phí vận chuyển cho đơn hàng trên 800,000
                         </Box>
-                        <Box textAlign="right" mt={2}>
-                            <Button className="pay__btn">Thanh toán</Button>
-                        </Box>
+                        <Button
+
+                            variant="contained"
+                            color="error"
+                            sx={{ width: 1, marginTop: 3, marginBottom: 3 }}
+                        >
+                            <Link to="/cart/payments" style={{textDecoration: "none", color: "white"}}>Thanh toán</Link>   
+                        </Button>
                     </Box>
-                    
                 </Box>
             </Container>
             <Footer />
         </Box>
+        );
+    }
+
+    return (
+        <div>{cart.length === 0 ? emptyCart() : notEmptyCart()}</div>
+        
     );
 }
 export default Cart;

@@ -4,6 +4,7 @@ import Header from "./components/header/header";
 import Home from "./pages/home/home";
 import Product from "./pages/product/product";
 import Cart from "./pages/cart/cart";
+import Payments from "./pages/payments/payments";
 
 import { MyContextProvider } from "./context/mycontext";
 
@@ -15,8 +16,10 @@ const App = () => {
                 <Switch>
                     <Route path="/" exact component={Home} />
                     <Route path="/product" component={Product} />
-                    <Route path="/cart" component={Cart} />
+                    <Route path="/cart" exact component={Cart} />
+                    
                 </Switch>
+                <Route path="/cart/payments" component={Payments} />
             </BrowserRouter>
         </MyContextProvider>
     );

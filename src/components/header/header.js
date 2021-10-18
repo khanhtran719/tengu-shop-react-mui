@@ -30,7 +30,7 @@ const Header = () => {
         setOpenRegister(!openRegister);
     }
 
-    const { setProducts, setIsLoaded, setError } = useContext(MyContext);
+    const { setProducts, setIsLoaded, setError, cart } = useContext(MyContext);
 
     useEffect(() => {
         fetch("https://616139a79cc856001706b6eb.mockapi.io/product/product")
@@ -55,7 +55,7 @@ const Header = () => {
                     <p className="header__top__phone">Hot Line: 0123456789</p>
                     <Box display="flex">
                         <a className="header__top__text" onClick={onOpenLogin}>Đăng nhập</a>
-                        <a className="header__top__text" onClick={onOpenRegister}>Đăng kí</a>
+                        <a className="header__top__text" onClick={onOpenRegister}>Đăng ký</a>
                     </Box>
                 </Container>
             </Box>
@@ -81,13 +81,21 @@ const Header = () => {
                         </Box>
                         <Link to="/cart">
                             <IconButton aria-label="cart">
-                                <Badge badgeContent={4} color="info">
+                                <Badge badgeContent={cart.length} color="info">
                                     <ShoppingCartIcon />
                                 </Badge>
                             </IconButton>
                         </Link>
                     </Box>
-                </Container>
+                </Container>     
+            </Box>
+            <Box
+                width="70px"
+                height="1px"
+                marginLeft="auto"
+                marginRight="auto"
+            >
+                <hr style={{border: "none", borderBottom: "3px solid red"}}/>
             </Box>
         </div>
     );

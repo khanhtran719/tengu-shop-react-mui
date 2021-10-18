@@ -1,9 +1,28 @@
-import React from "react";
+import React, {useContext} from "react";
 import "./itemProduct.css";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button"
 
-const ItemProduct = ({name, price}) => {
+import { MyContext } from "../../../context/mycontext";
+
+const ItemProduct = ({product}) => {
+    const { cart, setCart } = useContext(MyContext);
+
+    const addProductToCart = () => {
+        let checkIndex = -1;
+        checkIndex = cart.findIndex(tmp => tmp.id === product.id);
+        if (checkIndex === -1) {
+            setCart([...cart, {
+                ...product,
+                amount: 1
+            }])
+        } else {
+            let arrayCart = [...cart];
+            arrayCart[checkIndex].amount += 1; 
+            setCart(arrayCart);
+        }
+        
+    }
     return (
         <>
             <Box width="100%" height="100%" position="relative" mb={2}>
@@ -12,11 +31,18 @@ const ItemProduct = ({name, price}) => {
                     fontSize="18px"
                     mt={2}
                 >
-                    {name}
+                    {product.name}
                 </Box>
-                <Box color="red" mt={1}>{price}₫</Box>
+                <Box color="red" mt={1}>{product.price}₫</Box>
                 <Box width="100%" mt={2}>
-                    <Button sx={{ width: "50%" }} variant="contained" color="error">Thêm vào giỏ</Button>
+                    <Button 
+                        sx={{ width: "50%" }} 
+                        variant="contained" 
+                        color="error"
+                        onClick={addProductToCart}
+                    >
+                        Thêm vào giỏ
+                    </Button>
                     <Button 
                         sx={{ width: "49%", marginLeft: "2px" }} 
                         variant="contained" 

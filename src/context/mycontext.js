@@ -25,6 +25,7 @@ export const MyContextProvider = ({children}) => {
     const [myProducts, setMyProducts] = useState([]);
     const [myShowProduct, setMyShowProduct] = useState(false);
     const [myIdProductNeedShow, setMyIdProductNeedShow] = useState("");
+    const [myCart, setMyCart] = useState([]);
     return (
         <MyContext.Provider value={{
             error: checkError,
@@ -39,6 +40,9 @@ export const MyContextProvider = ({children}) => {
 
             idProductNeedShow: myIdProductNeedShow,
             setIdProductNeedShow: setMyIdProductNeedShow,
+
+            cart: myCart,
+            setCart: setMyCart,
         }}>
             {children}
         </MyContext.Provider>

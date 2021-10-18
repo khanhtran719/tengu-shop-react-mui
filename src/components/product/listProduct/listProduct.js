@@ -18,7 +18,7 @@ const ListProduct = ({ mdi, page, numPage }) => {
                             if (index < 20) {
                                 return (
                                     <Grid item xs={6} md={mdi} key={product.id}>
-                                        <ItemProduct name={product.name} price={product.price} />
+                                        <ItemProduct product={product} />
                                     </Grid>
                                 );
                             }
@@ -26,7 +26,7 @@ const ListProduct = ({ mdi, page, numPage }) => {
                         else {
                             return (
                                 <Grid item xs={6} md={mdi} key={product.id}>
-                                    <ItemProduct name={product.name} price={product.price} />
+                                    <ItemProduct product={product} />
                                 </Grid>
                             );
                         }
@@ -36,7 +36,7 @@ const ListProduct = ({ mdi, page, numPage }) => {
                         if (index >= (numOfProduct * (numPage - 1)) && index < (numOfProduct * numPage)) {
                             return (
                                 <Grid item xs={6} md={mdi} key={product.id}>
-                                    <ItemProduct name={product.name} price={product.price} />
+                                    <ItemProduct product={product} />
                                 </Grid>
                             );
                         }
