@@ -8,13 +8,13 @@ import Banner4 from "../../assets/banner/banner_4.png";
 import useWindowDimensions from "../../ultis/windowDimensions";
 
 const Banner = () => {
-    const { height, width } = useWindowDimensions();
+    const { width } = useWindowDimensions();
     return (
         <div className="banner">
             <Box display={width < "1024" ? "block" : "flex"} justifyContent="space-between" >
                 <Box position="relative">
                     <Box position="absolute" left="16px" bottom="8px">
-                        <a className="absolute__content">TẤT CẢ SẢN PHẨM</a>
+                        <Box className="absolute__content">TẤT CẢ SẢN PHẨM</Box>
                         <p className="absolute__text">
                             Không gian đẹp của người tinh tế
                         </p>
@@ -24,7 +24,7 @@ const Banner = () => {
                 <Box >
                     <Box position="relative">
                         <Box position="absolute" left="16px" bottom="8px">
-                            <a className="absolute__content">GIẤY DÁN TƯỜNG</a>
+                            <Box className="absolute__content">GIẤY DÁN TƯỜNG</Box>
                             <p className="absolute__text">
                                 Không gian đẹp của người tinh tế
                             </p>
@@ -34,7 +34,7 @@ const Banner = () => {
                     <Box display={width < "1024" ? "block" : "flex"} justifyContent="space-between">
                         <Box position="relative">
                             <Box position="absolute" left="16px" bottom="8px">
-                                <a className="absolute__content">TRANH TREO TƯỜNG</a>
+                                <Box className="absolute__content">TRANH TREO TƯỜNG</Box>
                                 <p className="absolute__text">
                                     Không gian đẹp của người tinh tế
                                 </p>
@@ -44,7 +44,7 @@ const Banner = () => {
                         </Box>
                         <Box position="relative">
                             <Box position="absolute" left="16px" bottom="8px">
-                                <a className="absolute__content">PHỤ KIỆN KHÁC</a>
+                                <Box className="absolute__content">PHỤ KIỆN KHÁC</Box>
                                 <p className="absolute__text">
                                     Không gian đẹp của người tinh tế
                                 </p>

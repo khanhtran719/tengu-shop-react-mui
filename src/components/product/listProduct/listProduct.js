@@ -21,6 +21,8 @@ const ListProduct = ({ mdi, page, numPage }) => {
                                         <ItemProduct product={product} />
                                     </Grid>
                                 );
+                            } else {
+                                return "";
                             }
                         }
                         else {
@@ -31,7 +33,7 @@ const ListProduct = ({ mdi, page, numPage }) => {
                             );
                         }
                     }
-                    else if (page === "product") {
+                    else {
                         var numOfProduct = 18;
                         if (index >= (numOfProduct * (numPage - 1)) && index < (numOfProduct * numPage)) {
                             return (
@@ -39,6 +41,8 @@ const ListProduct = ({ mdi, page, numPage }) => {
                                     <ItemProduct product={product} />
                                 </Grid>
                             );
+                        } else {
+                            return "";
                         }
                     }
                 })}

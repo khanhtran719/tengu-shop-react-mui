@@ -47,11 +47,11 @@ const Payments = () => {
 
     useEffect(() => {
         let sumOfMoney = 0;
-        cart.map((product) => {
+        for (let product in cart) {
             sumOfMoney += product.price * product.amount;
-        })
+        }
         setPayment(sumOfMoney);
-    })
+    },[cart])
 
     const onChangePanel = (panel) => (event, newExpanded) => {
         setExpanded(newExpanded ? panel : false);
@@ -62,7 +62,7 @@ const Payments = () => {
     };
 
     const handleSubmit = () => {
-
+        console.log(ward + note);
     }
     return (
         <Box m={0} p={0} mt={2}>
@@ -159,7 +159,7 @@ const Payments = () => {
                             <TextareaAutosize
                                 aria-label="empty textarea"
                                 placeholder="Ghi chú ..."
-                                onChange={(e, value) => console.log(e.target.value)}
+                                onChange={(e, value) => setNote(value)}
                                 style={{ width: "95%", height: 60, fontSize: 16, padding: 8, borderRadius: 5 }}
                             />
                         </Grid>

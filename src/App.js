@@ -5,6 +5,9 @@ import Home from "./pages/home/home";
 import Product from "./pages/product/product";
 import Cart from "./pages/cart/cart";
 import Payments from "./pages/payments/payments";
+import AboutUs from "./pages/aboutus";
+import Contact from "./pages/contact";
+import HotSale from "./pages/hotsale";
 
 import { MyContextProvider } from "./context/mycontext";
 
@@ -17,9 +20,11 @@ const App = () => {
                     <Route path="/" exact component={Home} />
                     <Route path="/product" component={Product} />
                     <Route path="/cart" exact component={Cart} />
-                    
+                    <Route path="/cart/payments" component={Payments} />
+                    <Route path="/about-us" component={AboutUs}/>
+                    <Route path="/contact" component={Contact}/>
+                    <Route path="/hotsale" component={HotSale}/>
                 </Switch>
-                <Route path="/cart/payments" component={Payments} />
             </BrowserRouter>
         </MyContextProvider>
     );

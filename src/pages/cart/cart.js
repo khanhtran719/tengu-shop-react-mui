@@ -27,11 +27,11 @@ const Cart = () => {
 
     useEffect(() => {
         let sumOfMoney = 0;
-        cart.map((product) => {
+        for (let product in cart) {
             sumOfMoney += product.price * product.amount;
-        })
+        }
         setPayment(sumOfMoney);
-    })
+    }, [cart])
     
     const onDeleteItem = (i) => {
         setCart(cart.filter((item) => item.id !== i));
