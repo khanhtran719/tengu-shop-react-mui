@@ -47,11 +47,9 @@ const Payments = () => {
 
     useEffect(() => {
         let sumOfMoney = 0;
-        for (let product in cart) {
-            sumOfMoney += product.price * product.amount;
-        }
+        cart.map(product => sumOfMoney += product.price * product.amount)
         setPayment(sumOfMoney);
-    },[cart])
+    }, [cart])
 
     const onChangePanel = (panel) => (event, newExpanded) => {
         setExpanded(newExpanded ? panel : false);
@@ -63,6 +61,12 @@ const Payments = () => {
 
     const handleSubmit = () => {
         console.log(ward + note);
+    }
+    const formatMoney = (n) => {
+        let str = String(n);
+        return str.split('').reverse().reduce((prev, next, index) => {
+            return ((index % 3) ? next : (next + '.')) + prev
+        }) + " đ"
     }
     return (
         <Box m={0} p={0} mt={2}>
@@ -180,7 +184,7 @@ const Payments = () => {
                                 sx={{ border: "1px solid lightgray", borderRadius: 1 }}
                             >
                                 <Box p={1}>Phí giao hàng</Box>
-                                <Box p={1}>30,000đ</Box>
+                                <Box p={1}>30.000đ</Box>
                             </Box>
                             <Box
                                 fontSize="18px"
@@ -258,7 +262,7 @@ const Payments = () => {
                                                         <Box ml={2} pt={1.5}>{product.name}</Box>
                                                     </Box>
                                                 </TableCell>
-                                                <TableCell align="right">{product.price * product.amount}đ</TableCell>
+                                                <TableCell align="right">{formatMoney(product.price * product.amount)}</TableCell>
                                             </TableRow>
                                         );
                                     })}
@@ -294,7 +298,7 @@ const Payments = () => {
                                     Giao hàng
                                 </Box>
                                 <Box fontFamily="Tahoma" fontWeight="500" fontSize="14px">
-                                    {payment >= 800000 ? "Miễn phí" : "30,000 đ"}
+                                    {payment >= 800000 ? "Miễn phí" : "30.000 đ"}
                                 </Box>
                             </Box>
                             <Box><hr /></Box>
@@ -303,15 +307,15 @@ const Payments = () => {
                                     Tổng cộng
                                 </Box>
                                 <Box id="payableAmount" fontFamily="Tahoma" fontWeight="500" fontSize="16px">
-                                    {payment >= 800000 ? payment : payment + 30000} đ
+                                    {payment >= 800000 ? formatMoney(payment) : formatMoney(payment + 30000)}
                                 </Box>
                             </Box>
                             <Button
                                 id="btnPayable"
-                                type="submit" 
-                                variant="contained" 
-                                color="info"  
-                                sx={{width: 1}}
+                                type="submit"
+                                variant="contained"
+                                color="info"
+                                sx={{ width: 1 }}
                             >Đặt hàng</Button>
                         </Grid>
                     </Grid>

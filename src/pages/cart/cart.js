@@ -27,9 +27,7 @@ const Cart = () => {
 
     useEffect(() => {
         let sumOfMoney = 0;
-        for (let product in cart) {
-            sumOfMoney += product.price * product.amount;
-        }
+        cart.map(product => sumOfMoney += product.price * product.amount)
         setPayment(sumOfMoney);
     }, [cart])
     
@@ -177,7 +175,6 @@ const Cart = () => {
                             Miễn phí vận chuyển cho đơn hàng trên 800,000
                         </Box>
                         <Button
-
                             variant="contained"
                             color="error"
                             sx={{ width: 1, marginTop: 3, marginBottom: 3 }}
