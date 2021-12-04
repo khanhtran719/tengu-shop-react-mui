@@ -33,7 +33,7 @@ const SearchForm = ({ openSearch, onCloseSearch }) => {
                     open={searchText !== "" ? true : false}
                     disableClearable
                     options={products}
-                    getOptionLabel={(option) => option.name}
+                    getOptionLabel={(option) => option.title}
                     renderOption={(props, option) => (
                         <Box {...props}>
                             <img
@@ -42,7 +42,7 @@ const SearchForm = ({ openSearch, onCloseSearch }) => {
                                 src={`https://cdn.shopify.com/s/files/1/0361/9563/1237/products/VR247-10234094_300x.jpg?v=1587357151`}
                                 alt=""
                             />
-                            {option.name}
+                            {option.title}
                         </Box>
                     )
                     }

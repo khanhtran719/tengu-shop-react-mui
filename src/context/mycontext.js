@@ -16,7 +16,10 @@ export const MyContext = createContext({
     setIdProductNeedShow: () => { },
     //set cart
     cart: [],
-    setCart: () => { }
+    setCart: () => { },
+    // login
+    isLogin: false,
+    setIsLogin: () => { }
 });
 
 export const MyContextProvider = ({children}) => {
@@ -26,6 +29,7 @@ export const MyContextProvider = ({children}) => {
     const [myShowProduct, setMyShowProduct] = useState(false);
     const [myIdProductNeedShow, setMyIdProductNeedShow] = useState("");
     const [myCart, setMyCart] = useState([]);
+    const [login, setLogin] = useState(false);
     return (
         <MyContext.Provider value={{
             error: checkError,
@@ -43,6 +47,9 @@ export const MyContextProvider = ({children}) => {
 
             cart: myCart,
             setCart: setMyCart,
+
+            isLogin: login,
+            setIsLogin: setLogin
         }}>
             {children}
         </MyContext.Provider>

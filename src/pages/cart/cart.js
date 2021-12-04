@@ -179,7 +179,7 @@ const Cart = () => {
                             color="error"
                             sx={{ width: 1, marginTop: 3, marginBottom: 3 }}
                         >
-                            <Link to="/cart/payments" style={{textDecoration: "none", color: "white"}}>Thanh toán</Link>   
+                            <Link to="/payments" style={{textDecoration: "none", color: "white"}}>Thanh toán</Link>   
                         </Button>
                     </Box>
                 </Box>

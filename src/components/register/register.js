@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import "./register.css";
 import LoginImg from "../../assets/img__login.png";
 import Dialog from "@mui/material/Dialog";
@@ -17,9 +18,35 @@ const Login = ({ openRegister, onCloseRegister, onChangeForm }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    const clearAll = () => {
+        setFirstName("");
+        setLastName("");
+        setEmail("");
+        setPassword("");
+    }
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(email + " " + password + " " + firstName + " " + lastName);
+        if (firstName !== "" || lastName !== "" || email !== "" || password !== ""){
+            axios.post('https://tengu-nodejs.herokuapp.com/api/auth/register/', {
+                email,
+                password,
+                firstName,
+                lastName
+            })
+            .then(response => {
+                console.log(response.data);
+                clearAll();
+                onCloseRegister();
+            })
+        }
+    }
+    const changeForm = () => {
+        onChangeForm();
+        setEmail("");
+        setPassword("");
+        setFirstName("");
+        setLastName("");
     }
     return (
         <Dialog open={openRegister} onClose={onCloseRegister} TransitionComponent={Transition}>
@@ -30,7 +57,7 @@ const Login = ({ openRegister, onCloseRegister, onChangeForm }) => {
                     <Box display="flex" justifyContent="space-between" mb={2}>
                         <TextField
                             label="Họ"
-                            variant="filled"
+                            // variant="filled"
                             required
                             value={firstName}
                             onChange={e => setFirstName(e.target.value)}
@@ -39,7 +66,7 @@ const Login = ({ openRegister, onCloseRegister, onChangeForm }) => {
                         />
                         <TextField
                             label="Tên"
-                            variant="filled"
+                            // variant="filled"
                             required
                             value={lastName}
                             onChange={e => setLastName(e.target.value)}
@@ -49,7 +76,7 @@ const Login = ({ openRegister, onCloseRegister, onChangeForm }) => {
                     </Box>
                     <TextField
                         label="Email"
-                        variant="filled"
+                        // variant="filled"
                         type="email"
                         required
                         value={email}
@@ -59,7 +86,7 @@ const Login = ({ openRegister, onCloseRegister, onChangeForm }) => {
                     />
                     <TextField
                         label="Mật khẩu"
-                        variant="filled"
+                        // variant="filled"
                         type="password"
                         required
                         value={password}
@@ -72,7 +99,7 @@ const Login = ({ openRegister, onCloseRegister, onChangeForm }) => {
                             Đăng ký
                         </Button>
                     </Box>
-                    <p className="text__change">Nếu đã có tài khoản, vui lòng đăng nhập <span className="text__change__click" onClick={onChangeForm}>tại đây</span></p>
+                    <p className="text__change">Nếu đã có tài khoản, vui lòng đăng nhập <span className="text__change__click" onClick={changeForm}>tại đây</span></p>
                 </Box>
             </form>
         </Dialog>

@@ -8,6 +8,7 @@ import Payments from "./pages/payments/payments";
 import AboutUs from "./pages/aboutus";
 import Contact from "./pages/contact";
 import HotSale from "./pages/hotsale";
+import DetailsProduct from "./pages/product/detailsProduct";
 
 import { MyContextProvider } from "./context/mycontext";
 
@@ -17,13 +18,14 @@ const App = () => {
             <BrowserRouter>
                 <Header />
                 <Switch>
-                    <Route path="/" exact component={Home} />
-                    <Route path="/product" component={Product} />
-                    <Route path="/cart" exact component={Cart} />
-                    <Route path="/cart/payments" component={Payments} />
-                    <Route path="/about-us" component={AboutUs}/>
-                    <Route path="/contact" component={Contact}/>
-                    <Route path="/hotsale" component={HotSale}/>
+                    <Route exact path="/" component={Home} />
+                    <Route exact path="/product" component={Product} />
+                    <Route path="/cart" component={Cart} />
+                    <Route path="/payments" component={Payments} />
+                    <Route path="/about-us" component={AboutUs} />
+                    <Route path="/contact" component={Contact} />
+                    <Route path="/hotsale" component={HotSale} />
+                    <Route path="/product/:id" component={DetailsProduct} />
                 </Switch>
             </BrowserRouter>
         </MyContextProvider>
