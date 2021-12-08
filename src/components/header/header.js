@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./header.css";
 import { Link } from "react-router-dom";
@@ -17,9 +17,13 @@ import LoginForm from "../login/login";
 import RegisterForm from "../register/register";
 import SearchForm from "../searchBar/searchBar";
 
-import { MyContext } from "../../context/mycontext";
+import { useDispatch, useSelector } from "react-redux";
+import { actSetProduct, actAutoLogin, actLogout, actSetCategory } from "../../actions/index";
 
 const Header = () => {
+    const dispatch = useDispatch();
+    const carts = useSelector(state => state.Cart);
+    const Account = useSelector(state => state.Account);
     //login-form
     const [openLogin, setOpenLogin] = useState(false);
     const onOpenLogin = () => setOpenLogin(true);
@@ -38,7 +42,7 @@ const Header = () => {
         setOpenRegister(!openRegister);
     }
     //
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -47,36 +51,42 @@ const Header = () => {
         setAnchorEl(null);
     };
 
-    const { setProducts, cart, isLogin, setIsLogin } = useContext(MyContext);
-
     useEffect(() => {
         fetch("https://tengu-nodejs.herokuapp.com/api/product/")
             .then(res => res.json())
             .then((result) => {
-                // setIsLoaded(true);
-                setProducts(result);
+                dispatch(actSetProduct(result));
             },
                 (error) => {
-                    // setIsLoaded(true);
-                    // setError(error);
                     alert("Error!");
                 }
             )
-    }, [setProducts]);
+    }, [dispatch]);
+    useEffect(() => {
+        fetch("https://tengu-nodejs.herokuapp.com/api/category/all")
+            .then(res => res.json())
+            .then((result) => {
+                dispatch(actSetCategory(result));
+            },
+                (error) => {
+                    alert("Error!");
+                }
+            )
+    }, [dispatch]);
     useEffect(() => {
         const token = localStorage.getItem("access_token");
         if (token) {
-            axios.post('https://tengu-nodejs.herokuapp.com/api/auth/time-expired', {}, { headers: { "token": token}})
+            axios.post('https://tengu-nodejs.herokuapp.com/api/auth/time-expired', {}, { headers: { "token": token } })
                 .then(response => {
                     if (response.data.status_code === 200) {
-                        setIsLogin(true);
+                        dispatch(actAutoLogin(response.data.data, token));
                     }
                 })
                 .catch((error) => {
                     console.log(error);
                 })
         }
-    }, [])
+    }, [dispatch])
     const accountForm = () => {
         return (
             <Box display="flex">
@@ -88,7 +98,7 @@ const Header = () => {
                         fontFamily="Tahoma"
                         fontSize="14px"
                     >
-                        Khánh Trần
+                        {Account.account.firstName + " " + Account.account.lastName}
                     </Box>
                 </Box>
                 <Menu
@@ -120,13 +130,18 @@ const Header = () => {
                     anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 >
                     <MenuItem>
-                        Tài khoản của tôi
+                        <Link to="/account" style={{
+                            textDecoration: "none",
+                            color: "black"
+                        }}>
+                            Tài khoản của tôi
+                        </Link>
                     </MenuItem>
                     <MenuItem>
                         Đơn mua
                     </MenuItem>
                     <MenuItem onClick={() => {
-                        setIsLogin(false);
+                        dispatch(actLogout())
                         localStorage.setItem("access_token", "");
                     }}>
                         Đăng xuất
@@ -151,7 +166,7 @@ const Header = () => {
             <Box bgcolor="lightgray">
                 <Container maxWidth="md" className="header__top__container">
                     <p className="header__top__phone">Hot Line: 0123456789</p>
-                    {isLogin ? accountForm() : loginAndRegisterForm()}
+                    {Account.isLogin ? accountForm() : loginAndRegisterForm()}
                 </Container>
             </Box>
             <Box display="flex">
@@ -173,7 +188,7 @@ const Header = () => {
                         </IconButton>
                         <Link to="/cart">
                             <IconButton aria-label="cart">
-                                <Badge badgeContent={cart.length} color="info">
+                                <Badge badgeContent={carts.allQuantity} color="info">
                                     <ShoppingCartIcon />
                                 </Badge>
                             </IconButton>

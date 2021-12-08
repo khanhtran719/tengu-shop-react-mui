@@ -1,25 +1,27 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Dialog from "@mui/material/Dialog";
 import Button from "@mui/material/Button";
 import Slide from "@mui/material/Slide";
 import Typography from '@mui/material/Typography';
+import Avatar from "@mui/material/Avatar";
 
 import ClearIcon from '@mui/icons-material/Clear';
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import IconButton from "@mui/material/IconButton";
 
-import { MyContext } from "../../../context/mycontext";
+import { useDispatch } from "react-redux";
+import { actAddMoreProduct } from "../../../actions";
+
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const FastView = ({ openView, onCloseView, product }) => {
+const FastView = ({ openView, onCloseView, product, setOpenAlert }) => {
+    const dispatch = useDispatch();
     const [quantity, setQuantity] = useState(1);
-
-    const { setCart, cart } = useContext(MyContext);
 
     const decreaseQuantity = () => {
         if (quantity > 1) {
@@ -29,22 +31,27 @@ const FastView = ({ openView, onCloseView, product }) => {
     const increaseQuantity = () => {
         setQuantity(quantity + 1);
     }
-    const addProductToCart = () => {
-        let checkIndex = -1;
-        checkIndex = cart.findIndex(tmp => tmp.id === product.id);
-        if (checkIndex === -1) {
-            setCart([...cart, {
-                ...product,
-                amount: quantity
-            }])
-        } else {
-            let arrayCart = [...cart];
-            arrayCart[checkIndex].amount += quantity;
-            setCart(arrayCart);
-        }
-        onCloseView();
+    const formatMoney = (n) => {
+        let str = String(n);
+        return str.split('').reverse().reduce((prev, next, index) => {
+            return ((index % 3) ? next : (next + '.')) + prev
+        }) + " đ"
     }
-
+    const discount = (product) => {
+        return (
+            <Box display="flex">
+                <Typography
+                    variant="h6"
+                    gutterBottom
+                    component="div"
+                    sx={{ mr: 3, padding: "auto 0", textDecoration: "line-through gray", color: "gray" }}
+                >
+                    {formatMoney(product.price)}
+                </Typography>
+                <Avatar sx={{ color: "red", backgroundColor: "#FFD700", fontSize: 14, width: 30, height: 30 }}>{product.discount_rate}%</Avatar>
+            </Box>
+        );
+    }
     return (
         <Dialog
             open={openView}
@@ -56,15 +63,20 @@ const FastView = ({ openView, onCloseView, product }) => {
                 <Box
                     sx={{ width: 400, border: "2px solid gray", p: 1 }}
                 >
-                    <img width="400px" src="https://cdn.shopify.com/s/files/1/0361/9563/1237/products/VR247-10234094_300x.jpg?v=1587357151" alt="1" />
+                    <img width="400px" src={product.img} alt="1" />
                 </Box>
                 <Box
                     sx={{ width: 400, ml: 3 }}
                 >
                     <Typography variant="h4" gutterBottom component="div">
-                        {product.name}
+                        {product.title}
                     </Typography>
-                    <Box sx={{ width: 50, mt: -2, backgroundColor: "red" }}><hr /></Box>
+                    <Box
+                        width="50px"
+                        height="1px"
+                    >
+                        <hr style={{ border: "none", borderBottom: "3px solid red" }} />
+                    </Box>
                     <Box display="flex" mt={4} mb={-1}>
                         <Typography
                             variant="h5"
@@ -73,18 +85,9 @@ const FastView = ({ openView, onCloseView, product }) => {
                             fontWeight="600"
                             mr={3}
                         >
-                            {product.price}0.000₫
+                            {formatMoney(Math.round((product.price - product.price * (product.discount_rate / 100)) / 1000) * 1000)}
                         </Typography>
-                        <Typography
-                            variant="h6"
-                            gutterBottom
-                            component="div"
-                            sx={{ mr: 3, padding: "auto 0", textDecoration: "line-through gray", color: "gray" }}>
-                            {product.price}0.000₫
-                        </Typography>
-                        {/* <Box sx={{ width: 30, height: 30, backgroundColor: "red" }}>
-                            <Box p={0.5} fontSize="14px" textAlign="center">15%</Box>
-                        </Box> */}
+                        {product.discount_rate !== 0 ? discount(product) : ""}
                     </Box>
                     <Typography variant="subtitle1" gutterBottom component="div" fontSize="14px">
                         Miễn phí vận chuyển cho đơn hàng từ 800.000
@@ -113,11 +116,18 @@ const FastView = ({ openView, onCloseView, product }) => {
                     </Box>
                     <Button
                         sx={{ mt: 4, borderRadius: "0" }}
+                        disabled={product.amount === 0 ? true : false}
                         size="large"
                         color="error"
                         variant="contained"
-                        onClick={addProductToCart}
-                    >THÊM VÀO GIỎ HÀNG</Button>
+                        onClick={() => {
+                            dispatch(actAddMoreProduct(product, quantity));
+                            setOpenAlert(true);
+                            onCloseView();
+                        }}
+                    >
+                        {product.amount !== 0 ? "THÊM VÀO GIỎ HÀNG" : "HẾT HÀNG"}
+                    </Button>
                 </Box>
                 <IconButton
                     onClick={onCloseView}

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import "./product.css";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -15,22 +15,62 @@ import ListProduct from "../../components/product/listProduct/listProduct";
 import SearchIcon from "@mui/icons-material/Search";
 import AppsIcon from "@mui/icons-material/Apps";
 import ViewListIcon from "@mui/icons-material/ViewList";
-
-import { MyContext } from "../../context/mycontext";
+import { useSelector } from "react-redux";
 
 const Product = () => {
+    const Product = useSelector(state => state.Product);
     const [view, setView] = useState(false);
-    const [sort, setSort] = useState('');
+    const [sort, setSort] = useState('sort_0');
     const [page, setPage] = useState(1);
+    const [sortProduct, setSortProduct] = useState([...Product.products]);
+    const [idKind, setIdKind] = useState("all");
 
-    const { products } = useContext(MyContext);
-    
     const onChangePage = (event, value) => {
-      setPage(value);
+        setPage(value);
     };
-
+    const onChangeIdKind = (id) => {
+        setIdKind(id);
+        if (id === "all"){
+            setSortProduct([...Product.products]);
+        }
+        else {
+            const urlAPI = "https://tengu-nodejs.herokuapp.com/api/category/?q=" + id;
+            fetch(urlAPI)
+                .then(res => res.json())
+                .then((result) => {
+                    setSortProduct([...result.message]);
+                })
+        }
+    }
     const onChangeSort = (e) => {
         setSort(e.target.value);
+        if (e.target.value === "sort_0") {
+            setSortProduct([...Product.products]);
+        } else if (e.target.value === "sort_1") {
+            sortProduct.sort(function (a, b) {
+                if (a.title < b.title) { return -1; }
+                if (a.title > b.title) { return 1; }
+                return 0;
+            })
+        } else if (e.target.value === "sort_2") {
+            sortProduct.sort(function (a, b) {
+                if (a.title > b.title) { return -1; }
+                if (a.title < b.title) { return 1; }
+                return 0;
+            })
+        } else if (e.target.value === "sort_3") {
+            sortProduct.sort(function (a, b) {
+                if (a.price > b.price) { return -1; }
+                if (a.price < b.price) { return 1; }
+                return 0;
+            })
+        } else if (e.target.value === "sort_4") {
+            sortProduct.sort(function (a, b) {
+                if (a.price < b.price) { return -1; }
+                if (a.price > b.price) { return 1; }
+                return 0;
+            })
+        }
     };
     return (
         <Box m={0} p={0} mt={1}>
@@ -65,7 +105,32 @@ const Product = () => {
                         </Box>
                         <hr />
                         {/* Các loại sản phẩm */}
-                        <Box fontSize="16px" mt={2}>TRANH VẢI TREO TƯỜNG</Box>
+                        <Box 
+                            onClick={onChangeIdKind.bind(this, "all")}
+                            sx={{
+                                mt: 1, p: 1, pl: 1,
+                                fontSize: 18,
+                                fontWeight: "all" === idKind ? "bold" : "none",
+                                backgroundColor: "all" === idKind ? "lightgray" : "#fff"
+                            }}
+                        >
+                            Tất cả
+                        </Box>
+                        {Product.categories.map((item, key) => {
+                            return (
+                                <Box key={item._id}
+                                    onClick={onChangeIdKind.bind(this, item._id)}
+                                    sx={{
+                                        mt: 1, p: 1, pl: 1,
+                                        fontSize: 18,
+                                        fontWeight: item._id === idKind ? "bold" : "none",
+                                        backgroundColor: item._id === idKind ? "lightgray" : "#fff"
+                                    }}
+                                >
+                                    {item.category}
+                                </Box>
+                            );
+                        })}
                         {/* /// */}
                         <Box
                             mt={4}
@@ -107,20 +172,20 @@ const Product = () => {
                                         displayEmpty
                                         inputProps={{ 'aria-label': 'Without label' }}
                                     >
-                                        <MenuItem onClick={() => setSort("")} value="">Phổ biến</MenuItem>
-                                        <MenuItem onClick={() => setSort("sort_1")} value={"sort_1"}>Từ A đến Z</MenuItem>
-                                        <MenuItem onClick={() => setSort("sort_2")} value={"sort_2"}>Từ Z đến A</MenuItem>
-                                        <MenuItem onClick={() => setSort("sort_3")} value={"sort_3"}>Giá từ cao đến thấp</MenuItem>
-                                        <MenuItem onClick={() => setSort("sort_4")} value={"sort_4"}>Giá từ thấp đến cao</MenuItem>
+                                        <MenuItem value={"sort_0"}>Phổ biến</MenuItem>
+                                        <MenuItem value={"sort_1"}>Từ A đến Z</MenuItem>
+                                        <MenuItem value={"sort_2"}>Từ Z đến A</MenuItem>
+                                        <MenuItem value={"sort_3"}>Giá từ cao đến thấp</MenuItem>
+                                        <MenuItem value={"sort_4"}>Giá từ thấp đến cao</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Box>
                         </Box>
                         <hr />
-                        <ListProduct mdi="4" page={"product"} numPage={page}/>
+                        <ListProduct sortProduct={sortProduct} numPage={page} />
                         <hr />
                         <Box display="flex" justifyContent="center" mb={2}>
-                            <Pagination count={Math.ceil(products.length / 18)} page={page} onChange={onChangePage}/>
+                            <Pagination count={Math.ceil(sortProduct.length / 18)} page={page} onChange={onChangePage} />
                         </Box>
                     </Box>
                 </Box>

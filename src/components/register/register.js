@@ -8,6 +8,9 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Slide from '@mui/material/Slide';
 
+import { useDispatch } from "react-redux";
+import { actRegister } from "../../actions/index";
+
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -17,6 +20,8 @@ const Login = ({ openRegister, onCloseRegister, onChangeForm }) => {
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    const dispatch = useDispatch();
 
     const clearAll = () => {
         setFirstName("");
@@ -35,21 +40,21 @@ const Login = ({ openRegister, onCloseRegister, onChangeForm }) => {
                 lastName
             })
             .then(response => {
-                console.log(response.data);
-                clearAll();
-                onCloseRegister();
+                dispatch(actRegister(response.data.customer, response.data.token));
+                closeForm();
             })
         }
     }
     const changeForm = () => {
         onChangeForm();
-        setEmail("");
-        setPassword("");
-        setFirstName("");
-        setLastName("");
+        clearAll();
+    }
+    const closeForm = () => {
+        onCloseRegister();
+        clearAll();
     }
     return (
-        <Dialog open={openRegister} onClose={onCloseRegister} TransitionComponent={Transition}>
+        <Dialog open={openRegister} onClose={closeForm} TransitionComponent={Transition}>
             <form className="form__register" onSubmit={handleSubmit}>
                 <img src={LoginImg} width="50%" alt="Decor-Make my house" />
                 <Box ml={2} mr={2}>

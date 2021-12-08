@@ -1,4 +1,6 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import Web3 from 'web3';
+import axios from "axios";
 import "./payments.css";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -24,32 +26,171 @@ import Button from "@mui/material/Button";
 
 import MoneyIcon from '@mui/icons-material/Money';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
-
 import Data from "../../dataJson/local.json";
-import { MyContext } from "../../context/mycontext";
-
 import Footer from "../../components/footer/footer";
+
+import { useSelector } from "react-redux";
 
 
 const Payments = () => {
+    const Cart = useSelector(state => state.Cart);
+    const Account = useSelector(state => state.Account);
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [phone, setPhone] = useState("");
     const [province, setProvince] = useState(null);
     const [district, setDistrict] = useState(null);
     const [ward, setWard] = useState(null);
     const [note, setNote] = useState(null);
+
+    //pay by etherum
+    const [account, setAccount] = useState("");
+    const [eth_vnd, setEth_Vnd] = useState();
+    const abi = [
+        {
+            constant: false,
+            inputs: [
+                {
+                    name: "id",
+                    type: "string",
+                },
+            ],
+            name: "payment",
+            outputs: [],
+            payable: true,
+            stateMutability: "payable",
+            type: "function",
+        },
+        {
+            constant: true,
+            inputs: [
+                {
+                    name: "",
+                    type: "uint256",
+                },
+            ],
+            name: "arr_bills",
+            outputs: [
+                {
+                    name: "id",
+                    type: "string",
+                },
+                {
+                    name: "walletAddress",
+                    type: "address",
+                },
+            ],
+            payable: false,
+            stateMutability: "view",
+            type: "function",
+        },
+        {
+            anonymous: false,
+            inputs: [
+                {
+                    indexed: false,
+                    name: "walletAddress",
+                    type: "address",
+                },
+                {
+                    indexed: false,
+                    name: "id",
+                    type: "string",
+                },
+            ],
+            name: "send_data",
+            type: "event",
+        },
+    ];
+    useEffect(() => {
+        fetch('https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=ETH,VND')
+            .then((data) => {
+                return data.json();
+            })
+            .then((data) => {
+                setEth_Vnd(data)
+            });
+    }, [])
+    const smartContractAddress = "0x891e7528207A8ACe6d45f7731f6cb3884336FfDe";
+    const web3 = new Web3(window.ethereum);
+    //   window.ethereum.enable();
+    // contract meta mask
+    let contractMetaMask = new web3.eth.Contract(abi, smartContractAddress);
+    console.log(contractMetaMask)
+
+    const handlePay = async () => {
+        if (typeof window.ethereum !== "undefined") {
+            console.log("MetaMask is installed!");
+            // Convert VND to ETH
+            const products = Cart.carts.map(cart => {
+                return {
+                    productId: cart.id,
+                    quantity: cart.quantity
+                };
+            })
+            let ethPayable = (Cart.bill / eth_vnd.VND).toFixed(18).toString();
+            await axios.post("https://tengu-nodejs.herokuapp.com/api/order/",
+                {
+                    customerId: Account.account._id,
+                    products: products,
+                    customerName: firstName + " " + lastName,
+                    payableAmount: Cart.bill >= 800000 ? Cart.bill : Cart.bill + 30000,
+                    amount: Cart.allQuantity,
+                    phone: phone,
+                    address: {
+                        province: province.name,
+                        district: district.name,
+                        ward: ward.name,
+                        note
+                    }
+                },
+                { headers: { token: localStorage.getItem("access_token") } })
+                .then((response) => {
+                    contractMetaMask.methods
+                        .payment(response.data._id)
+                        .send({
+                            from: account,
+                            value: web3.utils.toWei(ethPayable, "ether"),
+                        })
+                        .then((data) => {
+                            console.log("Thanh toán thành công");
+                        })
+                        .catch((err) => {
+                            axios.delete(
+                                "https://tengu-nodejs.herokuapp.com/api/order/" +
+                                response.data._id,
+                                {}
+                            )
+                                .then(() => {
+                                    console.log("Thanh toán thất bại");
+                                })
+                                .catch((err) => {
+                                    console.log(err);
+                                });
+                        });
+                }).catch(error => {
+                    console.log(error)
+                })
+        } else {
+            alert("Vui lòng cài đặt MetaMask");
+        }
+    };
+    if (window.ethereum) {
+        window.ethereum.on('accountsChanged', function (accounts) {
+            setAccount(accounts[0])
+            console.log(account)
+        })
+    }
+
+    const handleConnectWallet = () => {
+        window.ethereum.request({ method: 'eth_requestAccounts' }).then((data) => { setAccount(data[0]) });
+        console.log(account);
+    }
     //radio button
     const [payMethod, setPayMethod] = useState('cod');
     //panel accordion
     const [expanded, setExpanded] = useState('panel1');
     // data from myContext
-    const { cart } = useContext(MyContext);
-    //sum money
-    const [payment, setPayment] = useState(0);
-
-    useEffect(() => {
-        let sumOfMoney = 0;
-        cart.map(product => sumOfMoney += product.price * product.amount)
-        setPayment(sumOfMoney);
-    }, [cart])
 
     const onChangePanel = (panel) => (event, newExpanded) => {
         setExpanded(newExpanded ? panel : false);
@@ -59,8 +200,40 @@ const Payments = () => {
         setPayMethod(event.target.value);
     };
 
-    const handleSubmit = () => {
-        console.log(ward + note);
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const products = Cart.carts.map(cart => {
+            return {
+                productId: cart.id,
+                quantity: cart.quantity
+            };
+        })
+        if (payMethod === "cod") {
+            axios.post("https://tengu-nodejs.herokuapp.com/api/order/",
+                {
+                    customerId: Account.account._id,
+                    products: products,
+                    customerName: firstName + " " + lastName,
+                    payableAmount: Cart.bill >= 800000 ? Cart.bill : Cart.bill + 30000,
+                    amount: Cart.allQuantity,
+                    phone: phone,
+                    address: {
+                        province: province.name,
+                        district: district.name,
+                        ward: ward.name,
+                        note
+                    }
+                },
+                { headers: { token: localStorage.getItem("access_token") } }
+            ).then(response => {
+                console.log(response);
+            })
+                .catch(error => {
+                    alert(error);
+                })
+        } else {
+            handlePay();
+        }
     }
     const formatMoney = (n) => {
         let str = String(n);
@@ -82,41 +255,42 @@ const Payments = () => {
                             >
                                 Thông tin nhận hàng
                             </Box>
-                            <TextField
+                            {/* <TextField
                                 required
                                 size="small"
                                 id="outlined-required"
                                 label="Email"
                                 defaultValue="@gmail.com"
                                 sx={{ width: 1, marginBottom: 2 }}
-                            />
+                            /> */}
                             <Box display="flex" justifyContent="space-between" mb={2}>
                                 <TextField
                                     required
                                     size="small"
-                                    id="outlined-required"
                                     label="Họ"
-                                    defaultValue="Trần"
+                                    value={firstName}
+                                    onChange={(e) => setFirstName(e.target.value)}
                                     sx={{ width: "49%" }}
                                 />
                                 <TextField
                                     required
                                     size="small"
-                                    id="outlined-required"
                                     label="Tên"
-                                    defaultValue="Khánh"
+                                    value={lastName}
+                                    onChange={(e) => setLastName(e.target.value)}
                                     sx={{ width: "49%" }}
                                 />
                             </Box>
                             <TextField
                                 required
                                 size="small"
-                                id="outlined-required"
                                 label="Số điện thoại"
-                                defaultValue="0967312210"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
                                 sx={{ width: 1, marginBottom: 2 }}
                             />
                             <Autocomplete
+                                required
                                 id="province-select"
                                 size="small"
                                 sx={{ width: 1, marginBottom: 2 }}
@@ -131,6 +305,7 @@ const Payments = () => {
                                 )}
                             />
                             <Autocomplete
+                                required
                                 disabled={province === null ? true : false}
                                 id="district-select"
                                 size="small"
@@ -146,6 +321,7 @@ const Payments = () => {
                                 )}
                             />
                             <Autocomplete
+                                required
                                 disabled={district === null ? true : false}
                                 id="ward-select"
                                 size="small"
@@ -161,10 +337,11 @@ const Payments = () => {
                                 )}
                             />
                             <TextareaAutosize
+                                required
                                 aria-label="empty textarea"
                                 placeholder="Ghi chú ..."
                                 onChange={(e, value) => setNote(value)}
-                                style={{ width: "95%", height: 60, fontSize: 16, padding: 8, borderRadius: 5 }}
+                                style={{ width: "95%", height: 100, fontSize: 16, padding: 8, borderRadius: 5 }}
                             />
                         </Grid>
                         <Grid item md={4}>
@@ -234,9 +411,17 @@ const Payments = () => {
                                     </Box>
                                 </AccordionSummary>
                                 <AccordionDetails>
-                                    <Typography p={2}>
-                                        Thanh toán ngay bằng Ethereum
-                                    </Typography>
+                                    <Box display="flex" justifyContent="space-between">
+                                        <Typography p={2}>
+                                            Thanh toán ngay bằng Ethereum
+                                        </Typography>
+                                        <Button
+                                            variant="contained"
+                                            onClick={handleConnectWallet}
+                                        >
+                                            Connet Wallet
+                                        </Button>
+                                    </Box>
                                 </AccordionDetails>
                             </Accordion>
                         </Grid>
@@ -251,18 +436,18 @@ const Payments = () => {
                             </Box>
                             <Table>
                                 <TableBody>
-                                    {cart.map((product) => {
+                                    {Cart.carts.map((product, key) => {
                                         return (
                                             <TableRow key={product.id}>
                                                 <TableCell align="left">
                                                     <Box display="flex">
-                                                        <Badge badgeContent={product.amount} color="info">
-                                                            <img width="50px" src="https://cdn.shopify.com/s/files/1/0361/9563/1237/products/VR247-10234094_300x.jpg?v=1587357151" alt="1" />
+                                                        <Badge badgeContent={product.quantity} color="info">
+                                                            <img width="50px" src={product.img} alt="1" />
                                                         </Badge>
-                                                        <Box ml={2} pt={1.5}>{product.name}</Box>
+                                                        <Box ml={2} pt={1.5}>{product.title}</Box>
                                                     </Box>
                                                 </TableCell>
-                                                <TableCell align="right">{formatMoney(product.price * product.amount)}</TableCell>
+                                                <TableCell sx={{ minWidth: 85 }} align="right">{formatMoney(product.price * product.quantity)}</TableCell>
                                             </TableRow>
                                         );
                                     })}
@@ -290,7 +475,7 @@ const Payments = () => {
                                     Tổng đơn hàng
                                 </Box>
                                 <Box fontFamily="Tahoma" fontWeight="500" fontSize="14px">
-                                    {payment} đ
+                                    {formatMoney(Cart.bill)}
                                 </Box>
                             </Box>
                             <Box display="flex" justifyContent="space-between" mt={1} >
@@ -298,7 +483,7 @@ const Payments = () => {
                                     Giao hàng
                                 </Box>
                                 <Box fontFamily="Tahoma" fontWeight="500" fontSize="14px">
-                                    {payment >= 800000 ? "Miễn phí" : "30.000 đ"}
+                                    {Cart.bill >= 800000 ? "Miễn phí" : "30.000 đ"}
                                 </Box>
                             </Box>
                             <Box><hr /></Box>
@@ -307,7 +492,7 @@ const Payments = () => {
                                     Tổng cộng
                                 </Box>
                                 <Box id="payableAmount" fontFamily="Tahoma" fontWeight="500" fontSize="16px">
-                                    {payment >= 800000 ? formatMoney(payment) : formatMoney(payment + 30000)}
+                                    {Cart.bill >= 800000 ? formatMoney(Cart.bill) : formatMoney(Cart.bill + 30000)}
                                 </Box>
                             </Box>
                             <Button

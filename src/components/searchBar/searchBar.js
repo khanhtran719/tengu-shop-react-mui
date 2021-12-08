@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -6,13 +6,12 @@ import TextField from '@mui/material/TextField';
 import IconButton from "@mui/material/IconButton";
 
 import SearchIcon from "@mui/icons-material/Search";
-
-import { MyContext } from "../../context/mycontext";
+import { useSelector } from "react-redux";
 
 const SearchForm = ({ openSearch, onCloseSearch }) => {
     const [searchText, setSearchText] = useState("");
 
-    const { products } = useContext(MyContext)
+    const Product = useSelector(state => state.Product);
 
     const onClose = () => {
         setSearchText("");
@@ -24,7 +23,7 @@ const SearchForm = ({ openSearch, onCloseSearch }) => {
             open={openSearch}
             onClose={onClose}
         >
-            <Box sx={{ width:  500, p: 2, m: "0 auto" }} display="flex" justifyContent="space-between">
+            <Box sx={{ width: 500, p: 2, m: "0 auto" }} display="flex" justifyContent="space-between">
                 <Autocomplete
                     freeSolo
                     size="small"
@@ -32,14 +31,14 @@ const SearchForm = ({ openSearch, onCloseSearch }) => {
                     id="search-bar"
                     open={searchText !== "" ? true : false}
                     disableClearable
-                    options={products}
+                    options={Product.products}
                     getOptionLabel={(option) => option.title}
                     renderOption={(props, option) => (
                         <Box {...props}>
                             <img
                                 loading="lazy"
                                 width="60"
-                                src={`https://cdn.shopify.com/s/files/1/0361/9563/1237/products/VR247-10234094_300x.jpg?v=1587357151`}
+                                src={option.img}
                                 alt=""
                             />
                             {option.title}

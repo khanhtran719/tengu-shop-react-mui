@@ -7,4 +7,5 @@
 }
 .add__text:hover {
     color:darkgrey;
+    text-decoration: underline;
 }
