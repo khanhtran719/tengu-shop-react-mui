@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -35,13 +36,19 @@ const SearchForm = ({ openSearch, onCloseSearch }) => {
                     getOptionLabel={(option) => option.title}
                     renderOption={(props, option) => (
                         <Box {...props}>
-                            <img
-                                loading="lazy"
-                                width="60"
-                                src={option.img}
-                                alt=""
-                            />
-                            {option.title}
+                            <Link to={"/product/" + option._id} 
+                            style={{ display: "flex", textDecoration: "none", color: "black", alignItems: "center" }}
+                            onClick={onClose}
+                            >
+                                <img
+                                    loading="lazy"
+                                    width="60"
+                                    src={option.img}
+                                    alt=""
+                                    style={{ marginRight: "5px" }}
+                                />
+                                {option.title}
+                            </Link>
                         </Box>
                     )
                     }
