@@ -19,7 +19,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const Login = ({ openLogin, onCloseLogin, onChangeForm }) => {
+const Login = ({ openLogin, onCloseLogin, onChangeForm, setRedirect }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorMess, setErrorMess] = useState(false);
@@ -38,6 +38,7 @@ const Login = ({ openLogin, onCloseLogin, onChangeForm }) => {
                     } else {
                         dispatch(actLogin(response.data));
                         localStorage.setItem("access_token", response.data.accessToken);
+                        setRedirect(false);
                         closeForm();
                     }
                 })

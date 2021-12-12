@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./header.css";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import Logo from "../../tengu-logo.png";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -24,6 +24,7 @@ const Header = () => {
     const dispatch = useDispatch();
     const carts = useSelector(state => state.Cart);
     const Account = useSelector(state => state.Account);
+    const [redirect, setRedirect] = useState(false);
     //login-form
     const [openLogin, setOpenLogin] = useState(false);
     const onOpenLogin = () => setOpenLogin(true);
@@ -141,7 +142,8 @@ const Header = () => {
                         Đơn mua
                     </MenuItem>
                     <MenuItem onClick={() => {
-                        dispatch(actLogout())
+                        dispatch(actLogout());
+                        setRedirect(true);
                         localStorage.setItem("access_token", "");
                     }}>
                         Đăng xuất
@@ -160,8 +162,9 @@ const Header = () => {
     }
     return (
         <div className="header">
-            <LoginForm openLogin={openLogin} onCloseLogin={onCloseLogin} onChangeForm={onChangeForm} />
-            <RegisterForm openRegister={openRegister} onCloseRegister={onCloseRegister} onChangeForm={onChangeForm} />
+            {redirect ? <Redirect to="/"/> : ""}
+            <LoginForm openLogin={openLogin} onCloseLogin={onCloseLogin} onChangeForm={onChangeForm} setRedirect={setRedirect}/>
+            <RegisterForm openRegister={openRegister} onCloseRegister={onCloseRegister} onChangeForm={onChangeForm} setRedirect={setRedirect}/>
             <SearchForm openSearch={openSearch} onCloseSearch={onCloseSearch} />
             <Box bgcolor="lightgray">
                 <Container maxWidth="md" className="header__top__container">

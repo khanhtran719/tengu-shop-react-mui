@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container } from "@mui/material"
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -56,12 +56,14 @@ function a11yProps(index) {
 const Account = () => {
     const dispatch = useDispatch();
     const [value, setValue] = useState(0);
+    const [redirect, setRedirect] = useState(false);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
     return (
         <Box>
+            {redirect ? <Redirect to="/"/> : ""}
             <Container maxWidth="lg">
                 <Box
                     sx={{ flexGrow: 1, backgroundColor: "#fff", display: 'flex', marginY: 3, minHeight: 500 }}
@@ -123,6 +125,7 @@ const Account = () => {
                                     <Link to="/" style={{textDecoration: "none", color: "gray"}}
                                     onClick={() => {
                                         dispatch(actLogout());
+                                        setRedirect(true);
                                         localStorage.setItem("access_token", "");
                                     }}>
                                         <Typography

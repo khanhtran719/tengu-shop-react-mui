@@ -15,7 +15,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const Login = ({ openRegister, onCloseRegister, onChangeForm }) => {
+const Login = ({ openRegister, onCloseRegister, onChangeForm, setRedirect }) => {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
@@ -41,6 +41,7 @@ const Login = ({ openRegister, onCloseRegister, onChangeForm }) => {
             })
             .then(response => {
                 dispatch(actRegister(response.data.customer, response.data.token));
+                setRedirect(false);
                 closeForm();
             })
         }

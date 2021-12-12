@@ -27,6 +27,7 @@ export const CartReducer = (state = initialState, action) => {
                         state.carts[key].quantity++;
                         check = true;
                     }
+                    return "";
                 });
                 if (!check) {
                     let _cart = {
@@ -63,6 +64,7 @@ export const CartReducer = (state = initialState, action) => {
                         state.carts[key].quantity += action.quantity;
                         _check = true;
                     }
+                    return "";
                 });
                 if (!_check) {
                     let __cart = {
@@ -104,6 +106,12 @@ export const CartReducer = (state = initialState, action) => {
             }
             return {
                 ...state,
+            }
+        case Types.CartService.CLEAR_ALL:
+            return {
+                carts: [],
+                bill: 0,
+                allQuantity: 0
             }
         default:
             return state;

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useHistory, generatePath } from "react-router-dom";
+// import {R} from "react-cssfx-loading";
 import "./itemProduct.css";
 import Box from "@mui/material/Box";
 import Button from '@mui/material/Button';
@@ -75,6 +76,7 @@ const ItemProduct = ({ product }) => {
                         fontSize="18px"
                         pt={2}
                         color="black"
+                        sx={{textTransform: "uppercase"}}
                     >
                         {product.title}
                     </Box>
@@ -87,10 +89,12 @@ const ItemProduct = ({ product }) => {
                         </Typography>
                     </Box>
                     <Button
+                        className="btn_addToCart"
                         sx={{ width: "50%" }}
-                        variant="outlined"
+                        variant="contained"
+                        // variant="outlined"
                         disabled={product.amount === 0 ? true : false}
-                        color="error"
+                        // color="error"
                         onClick={() => {
                             dispatch(actAddProduct(product));
                             setOpenAlert(true);
@@ -99,9 +103,10 @@ const ItemProduct = ({ product }) => {
                         Thêm vào giỏ
                     </Button>
                     <Button
+                        className="btn_viewFast"
                         sx={{ width: "49%", marginLeft: "2px" }}
                         variant="contained"
-                        color="error"
+                        // color="error"
                         onClick={onOpenView}
                     >
                         Xem nhanh

@@ -40,6 +40,9 @@ const Product = () => {
                 .then((result) => {
                     setSortProduct([...result.message]);
                 })
+            // let category = Product.products.filter(item => item._id === id);
+            // console.log(category);
+            // setSortProduct([...category]);
         }
     }
     const onChangeSort = (e) => {

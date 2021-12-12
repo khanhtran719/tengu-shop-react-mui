@@ -59,6 +59,11 @@ export const actDecreaseQuantity = (key) => {
         key: key
     }
 }
+export const actClearAll = () => {
+    return {
+        type: Types.CartService.CLEAR_ALL
+    }
+}
 //products
 export const actSetProduct = (products) => {
     return {

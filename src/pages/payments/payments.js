@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Redirect } from "react-router-dom";
 import Web3 from 'web3';
 import axios from "axios";
 import "./payments.css";
@@ -29,10 +30,12 @@ import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import Data from "../../dataJson/local.json";
 import Footer from "../../components/footer/footer";
 
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { actClearAll } from "../../actions";
 
 
 const Payments = () => {
+    const dispatch = useDispatch();
     const Cart = useSelector(state => state.Cart);
     const Account = useSelector(state => state.Account);
     const [firstName, setFirstName] = useState("");
@@ -42,6 +45,7 @@ const Payments = () => {
     const [district, setDistrict] = useState(null);
     const [ward, setWard] = useState(null);
     const [note, setNote] = useState(null);
+    const [redirect, setRedirect] = useState(false);
 
     //pay by etherum
     const [account, setAccount] = useState("");
@@ -141,24 +145,27 @@ const Payments = () => {
                         province: province.name,
                         district: district.name,
                         ward: ward.name,
-                        note
-                    }
+                        note: note
+                    },
+                    status: "success"
                 },
                 { headers: { token: localStorage.getItem("access_token") } })
                 .then((response) => {
                     contractMetaMask.methods
-                        .payment(response.data._id)
+                        .payment(response.data.message._id)
                         .send({
                             from: account,
                             value: web3.utils.toWei(ethPayable, "ether"),
                         })
                         .then((data) => {
-                            console.log("Thanh toán thành công");
+                            setRedirect(true);
+                            clearAll();
+                            alert("Đặt hàng thành công!");
                         })
                         .catch((err) => {
                             axios.delete(
                                 "https://tengu-nodejs.herokuapp.com/api/order/" +
-                                response.data._id,
+                                response.data.message._id,
                                 {}
                             )
                                 .then(() => {
@@ -183,7 +190,11 @@ const Payments = () => {
     }
 
     const handleConnectWallet = () => {
-        window.ethereum.request({ method: 'eth_requestAccounts' }).then((data) => { setAccount(data[0]) });
+        window.ethereum.request({ method: 'eth_requestAccounts' })
+            .then((data) => {
+                setAccount(data[0])
+                alert("Connect Success!")
+            });
         console.log(account);
     }
     //radio button
@@ -226,7 +237,9 @@ const Payments = () => {
                 },
                 { headers: { token: localStorage.getItem("access_token") } }
             ).then(response => {
-                console.log(response);
+                setRedirect(true);
+                clearAll();
+                alert("Đặt hàng thành công!");
             })
                 .catch(error => {
                     alert(error);
@@ -241,8 +254,13 @@ const Payments = () => {
             return ((index % 3) ? next : (next + '.')) + prev
         }) + " đ"
     }
+    const clearAll = () => {
+        dispatch(actClearAll());
+        setPayMethod("cod");
+    }
     return (
         <Box m={0} p={0} mt={2}>
+            {redirect ? <Redirect to="/cart" /> : ""}
             <Container maxWidth="lg" sx={{ marginBottom: 3 }}>
                 <form onSubmit={handleSubmit}>
                     <Grid container spacing={3}>
